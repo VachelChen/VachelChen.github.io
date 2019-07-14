@@ -1,32 +1,31 @@
-# Prerequisites
-*.d
+# OS X
+.DS_Store
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Jekyll build
+/_site/
+.jekyll-metadata
+#Gemfile.lock
 
-# Precompiled Headers
-*.gch
-*.pch
+# webstorm
+.idea/
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# others
+*.swp
 
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# site build
+*.gem
+*.rbc
+.bundle
+.config
+coverage
+InstalledFiles
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
+vendor
+Gemfile.lock
+node_modules
