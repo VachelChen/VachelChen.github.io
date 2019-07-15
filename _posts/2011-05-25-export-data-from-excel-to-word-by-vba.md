@@ -1,16 +1,16 @@
 ---
 layout: post
-title: 使用 VBA 将 Excel 数据导入到 Word 表格中
-categories: Excel
-description: 将 Excel 里的数据使用 VBA 导入 Word 表格中。
-keywords: Excel, VBA, Word
+title: 软著申请——基于Django的行业学会科技奖评价管理系统
+categories: Django
+description: 系统正在筹划申请软著，分享一些申请书的填写
+keywords: Django, applicant
 ---
 
-## 需求
+## 申报材料准备
 
-现要求将一个 Excel 数据表中的每行数据导成一个 Word 文档，即有多少行数据就生成多少个 Word 文档，Excel 每列与 Word 文档中的表格项一一对应。
 
-## 实现
+
+## 实现过程
 
 **前置工作：**将 Word 文档空表格当作模板文档做好，与 Excel 数据源文件置于同一路径下。
 
