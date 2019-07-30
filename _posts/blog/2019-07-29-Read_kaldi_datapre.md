@@ -8,7 +8,7 @@ keywords: Kaldi, preparation
 
 大致了解了HMM后，我们迈进进kaldi的源码大门，目的在于大致理解kaldi如何实现，还有MFCC如何提取特征的。
 
-![kaldi_all](/images/blog/kaldi_all.png)
+![kaldi_all](/images/blog/kaldi_all.jpg)
 
 我们选取了清华 thchs30 作为数据集，之前懵懵懂懂的跑过一些kaldi自带的简单样例，因为我是使用VMware（后悔买电脑时没有买大一点磁盘，这样划系统了用起来更爽），清华数据集足足有快7G，学长装了两CPU才跑出来，我索性先不跑了...直接先从跑好的文件里学习。
 
@@ -43,6 +43,7 @@ cmd.sh内容如下：
 path.sh是完成环境变量的一些设置，将KALDI_ROOT赋值为当前目录下上移三层目录，再判断指定位置的env.sh这个环境配置文件是否为普通文件，并且执行。PATH与LC_ALL也是如此，其中涉及到：符，分割了多个路径，把这些路径都加入了指定变量里。还有 >&2 表示标准错误输出。
 
 - H = 'pwd';n = 4;
+
 H赋值为当前路径，n代表并行数量。
 
 - thchs=... #corpus and trans directory
