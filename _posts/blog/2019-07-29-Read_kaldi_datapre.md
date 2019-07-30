@@ -48,7 +48,7 @@ H赋值为当前路径，n代表并行数量。
 
 - thchs=... #corpus and trans directory
 
-这个存放了数据集的内容。
+存放了数据集的内容。
 
 ### data preparation
 
@@ -116,18 +116,87 @@ echo "creating test_phone for phone decoding"
 }
 ```
 
-### MessageQueue
+### data preparation 对应分析
 
-持有将被 Looper 分发的消息列表的底层类。消息都是通过与 Looper 关联的 Handler 添加到 MessageQueue，而不是直接操作 MessageQueue。
+```shell
+#!/bin/bash
 
-可以用 Looper.myQueue() 获取当前线程的 MessageQueue 实例。
+#shell语言标准开头
 
-### Message
+# Copyright 2016  Tsinghua University (Author: Dong Wang, Xuewei Zhang).  Apache 2.0.
+#           2016  LeSpeech (Author: Xingyu Na)
 
-定义一个可以发送给 Handler 的消息，包含描述和任意数据对象。消息对象有两个额外的 int 字段和一个 object 字段，这可以满足大部分场景的需求了。
+#This script pepares the data directory for thchs30 recipe. 
+#It reads the corpus and get wav.scp and transcriptions.
+
+dir=$1
+corpus_dir=$2
+
+#将刚刚run.sh中的两个参数分辨传递给dir，corpus_dir，分别是当前路径和数据集地址。
+
+cd $dir
+
+echo "creating data/{train,dev,test}"
+mkdir -p data/{train,dev,test}
+
+#打开到当前目录，输出并创建三个指定名字文件夹。
+
+#create wav.scp, utt2spk.scp, spk2utt.scp, text
+(
+for x in train dev test; do
+  echo "cleaning data/$x"
+  cd $dir/data/$x
+  rm -rf wav.scp utt2spk spk2utt word.txt phone.txt text
+  echo "preparing scps and text in data/$x"
+
+  #首先完成数据清洗，进入train dev test这三个文件夹，强制递归删除掉wav.scp utt2spk spk2utt word.txt phone.txt text这些文件。
+
+  #updated new "for loop" figured out the compatibility issue with Mac     created by Xi Chen, in 03/06/2018
+  #for nn in `find  $corpus_dir/$x/*.wav | sort -u | xargs -i basename {} .wav`; do
+  for nn in `find  $corpus_dir/$x -name "*.wav" | sort -u | xargs -I {} basename {} .wav`; do
+
+  # 这里是查找数据集目录下以 .wav 结尾的文件，并去重排序，并取出基础名（去除路径）。
+  # 这里多解释一下xargs的作用，xargs是将前面的标准输出作为后面指定命令的参数，也通常与管道符连用，因为管道符是将前面的标准输出座位后面的标准输入，而无法作为后面指定命令的参数。
+  # 坊间有一种说法，将 xargs 解读为乘号（x）和参数（args）的合体，很形象地表达了 xargs 的作用所在。
+
+      spkid=`echo $nn | awk -F"_" '{print "" $1}'`
+      spk_char=`echo $spkid | sed 's/\([A-Z]\).*/\1/'`
+      spk_num=`echo $spkid | sed 's/[A-Z]\([0-9]\)/\1/'`
+      spkid=$(printf '%s%.2d' "$spk_char" "$spk_num")
+      utt_num=`echo $nn | awk -F"_" '{print $2}'`
+      uttid=$(printf '%s%.2d_%.3d' "$spk_char" "$spk_num" "$utt_num")
+      echo $uttid $corpus_dir/$x/$nn.wav >> wav.scp
+      echo $uttid $spkid >> utt2spk
+      echo $uttid `sed -n 1p $corpus_dir/data/$nn.wav.trn` >> word.txt
+      echo $uttid `sed -n 3p $corpus_dir/data/$nn.wav.trn` >> phone.txt
+  done 
+  
+  
+
+  cp word.txt text
+  sort wav.scp -o wav.scp
+  sort utt2spk -o utt2spk
+  sort text -o text
+  sort phone.txt -o phone.txt
+done
+) || exit 1
+
+utils/utt2spk_to_spk2utt.pl data/train/utt2spk > data/train/spk2utt
+utils/utt2spk_to_spk2utt.pl data/dev/utt2spk > data/dev/spk2utt
+utils/utt2spk_to_spk2utt.pl data/test/utt2spk > data/test/spk2utt
+
+echo "creating test_phone for phone decoding"
+(
+  rm -rf data/test_phone && cp -R data/test data/test_phone  || exit 1
+  cd data/test_phone && rm text &&  cp phone.txt text || exit 1
+)
+}
+```
+
+
+### 总结分析
 
 > 虽然 Message 的构造方法是 public 的，但最推荐的得到一个消息对象的方式是调用 Message.obtain() 或者 Handler.obtainMessage() 系列方法，这些方法会从一个对象回收池里捡回能复用的对象。
 
-## 提出问题
 
 
