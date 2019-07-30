@@ -206,12 +206,17 @@ for x in train dev test; do
   sort utt2spk -o utt2spk
   sort text -o text
   sort phone.txt -o phone.txt
+
+  #从word.txt拷贝出text，排序四个文件。
+
 done
 ) || exit 1
 
 utils/utt2spk_to_spk2utt.pl data/train/utt2spk > data/train/spk2utt
 utils/utt2spk_to_spk2utt.pl data/dev/utt2spk > data/dev/spk2utt
 utils/utt2spk_to_spk2utt.pl data/test/utt2spk > data/test/spk2utt
+
+#在train、dev、test中都对应有spk2utt
 
 echo "creating test_phone for phone decoding"
 (
@@ -224,7 +229,7 @@ echo "creating test_phone for phone decoding"
 
 ### 总结分析
 
-> 虽然 Message 的构造方法是 public 的，但最推荐的得到一个消息对象的方式是调用 Message.obtain() 或者 Handler.obtainMessage() 系列方法，这些方法会从一个对象回收池里捡回能复用的对象。
+> 该部分的数据准备与数据相关，保存在data/train、data/dev、data/test之类的目录下，“数据”部分与特定的录音数据有关，包括训练测试集划分、音频分段、文本标注、发音标注、说话人信息等。
 
 
 
