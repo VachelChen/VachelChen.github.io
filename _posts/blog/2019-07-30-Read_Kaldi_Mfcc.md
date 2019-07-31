@@ -1,26 +1,56 @@
 ---
 layout: post
-title: Kaldi 源码分析 —— Data Preparation
+title: Kaldi 源码分析 —— MFCC Features
 categories: Kaldi
-description: 主要分析 thchs-30_data_prep.sh 文件内容
-keywords: Kaldi, preparation
+description: 阅读mfcc文件夹，分析特征提取过程
+keywords: Kaldi, mfcc, features
 ---
 
-大致了解了HMM后，我们迈进进kaldi的源码大门，目的在于大致理解kaldi如何实现，还有MFCC如何提取特征的。
+语音特征参数MFCC的提取过程是确保语音识别准确的关键步骤。
+MFCC全称Mel-scaleFrequency Cepstral Coefficients，中文名叫梅尔倒谱系数。
+根据人耳听觉机理的研究发现，人耳对不同频率的声波有不同的听觉敏感度。从300Hz到3400Hz的语音信号对语音的清晰度影响最大。
 
-![kaldi_all](/images/blog/kaldi_all.jpg)
+## 一、预加重（Preemphasis）
 
-我们选取了清华 thchs30 作为数据集，之前懵懵懂懂的跑过一些kaldi自带的简单样例，因为我是使用VMware（后悔买电脑时没有买大一点磁盘，这样划系统了用起来更爽），清华数据集足足有快7G，学长装了两CPU才跑出来，我索性先不跑了...直接先从跑好的文件里学习。
+预加重是MFCC特征提取的第一步，因为低频信号比高频信号具有更多的能量。这种跨越频率的能量下降(称为频谱倾斜)是由声门脉冲的性质引起的。提高高频能量使这些高共振峰的信息更容易被声学模型利用，提高了检测精度。
 
-附上数据集下载连接：
-* [thchs30](http://www.openslr.org/18/)
+![filter](/images/blog/filter.png)
 
-## 初步印象
+预加重是使用滤波器完成的，即先过滤出高频的声段，再进行加重操作，滤波器如下所示：
 
-文件多为 .sh 和 .pl 后缀，前者为shell所编写的脚本文件，后者为Perl所写，最开始让老师让回去看run.sh，课上一晃而过我庆幸自己刚刚学完Linux以及shell心想应该还可以大致看看，然而当打开文件后我真是高估了我自己。
-不得不说上课所学的掌握和实际应用的理解完全两码事。
+![filter2](/images/blog/filter2.png)
 
-### run.sh 的前五条语句
+式中的值介于0.9-1.0之间，我们通常取0.97。
+
+## 二、加窗（Windowing）
+
+语音特征其实有很大的变化，我们在不同的情绪以及不同的环境中所收集的所谓spectral features是不同的，所以我们认为语音其实是一个非平稳信号，这意味着他的统计特性在时间上不是恒定的。但我们一般认为在短时间内提取的spectral features是平稳的。
+
+![windows](/images/blog/windows.png)
+
+我们通过在某区域内使用窗口来提取波形，同时使用窗口的宽度 wide（以毫秒为单位）、连续窗口之间的偏移量 offset 以及窗口的形状 shape 来描述窗口过程，窗口提取到的语音称为帧，其中帧的毫秒值称为帧的大小 frame size ，并将连续窗口的左边缘间隔的毫秒值称之为帧的移动 frame shift。方程为：
+
+```
+y[n] = w[n]s[n]
+```
+
+其中n表示时间，s[n]表示语音原本的状态，w[n]表示窗口形状的处理，y[n]表示最终状态。
+
+窗口形状的概念听起来比较抽象，以下例子将做一个说明。
+上图中窗口提取出来的信号与原始信号一样，所以这些窗口都是矩形窗口，也是最简单的窗口。然而，矩形窗口可能会引起问题，因为它是垂直的，会在其边界处突然切断信号。当我们做傅里叶分析时，这些不连续点会产生问题。因此，在MFCC提取中使用的一个更常见的窗口是汉明窗口（Hamming Window），它将信号的值在窗口边界处缩小到汉明零，以避免不连续。方程如下(假设窗口为L帧长):
+
+![windows2](/images/blog/windows2.png)
+
+以下是一般情况的汉明窗，不同的a值会产生不同的汉明窗，一般情况下a取0.46。
+
+![windows3](/images/blog/windows3.png)
+
+汉明窗得到的信号：
+
+![windows4](/images/blog/windows4.png)
+
+### 离散傅里叶变换（Discrete Fourier Transform
+）
 
 run.sh 的前五条语句其实就是一些初始化和配置环境变量的过程：
 
