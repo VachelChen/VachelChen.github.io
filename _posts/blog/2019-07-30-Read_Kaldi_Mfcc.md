@@ -84,8 +84,11 @@ DFT定义如下：
 ### 倒谱（The Cepstrum）
 
 这里有一个有趣的文字游戏，频谱的前四个字母倒过来就是倒谱：
+
 频谱 spectrum
+
 倒谱 cepstrum
+
 
 因为梅尔谱（Mel spectrum）来做特征提取会存在一定问题，为了解决这一点，我们下一步将进行倒谱（cepstrum）计算。
 
