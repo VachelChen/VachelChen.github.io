@@ -12,7 +12,7 @@ keywords: Python, Excel
 
 话不多说，直接上程序：
 
-'''python
+```python
 
 from xlutils.copy import copy	#用于拷贝格式
 import xlrd						#用于读取Excel表格中的数据
@@ -95,5 +95,10 @@ new_sheet.write(8,4,Y,style)
 # 保存
 new_excel.save('Value.xls')
 
-'''
+```
 
+以下就分几个板块来说明：
+
+#### 读取Excel
+
+步骤
