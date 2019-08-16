@@ -6,7 +6,7 @@ description: 分析与提取特征相关的脚本文件，与理论知识做比�
 keywords: Kaldi, mfcc, features
 ---
 
-run.sh的第二块内容就是创建提取mfcc特征：
+run.sh的第二块内容就是创建提取mfcc特征。
 
 ```shell
 
@@ -123,7 +123,7 @@ if [ $# -lt 1 ] || [ $# -gt 3 ]; then
 fi
 # 这块就是如果不符合这些参数列表，则需要更改符合这些参数。
 
-data=$1		    # 将第一个参数赋给data，其实就是上面这个说明中说的<data-dir>c/train
+data=$1		    # 将第一个参数赋给data，其实就是上面这个说明中说的<data-dir>
 # 判断如果参数总数大于等于2，则将第二个参数赋给logdir，否则将data下的log路径赋给logdir
 if [ $# -ge 2 ]; then	# 如果参数大于等于2
   logdir=$2		# logdir=exp/make_mfcc/train
@@ -139,16 +139,20 @@ fi
 # make $mfccdir an absolute pathname.
 mfccdir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $mfccdir ${PWD}`
 # -e 执行后面的语句
-#  
-#  ！否定 ~匹配 m ^开头 /代表根目录
+#  ！否定 ~匹配 ^开头 /代表根目录
 #  若不是绝对路径改成
+#  这块是调用perl脚本来创建目录，给mfccdir赋值一个绝对路径名称
+#  @ARGV首先是一个数组，不管脚本里有没有把它写出来，它始终是存在的。@ARGV是Perl默认用来接收参数的数组，这些参数来源于用户在命令行上输入的参数。
 #utterence
 
 # use "name" as part of name of the archive.
-name=`basename $data`	# data/mfcc/train输出train
+# 使用“名称”作为文件名称的一部分
+name=`basename $data`
+
 # 创建mfcc特征文件夹和log文件夹
 mkdir -p $mfccdir || exit 1;
 mkdir -p $logdir || exit 1;
+# 创建两个目录
 # 如果之前有执行过生成了特征信息文件则备份
 if [ -f $data/feats.scp ]; then
   mkdir -p $data/.backup
@@ -159,6 +163,7 @@ fi
 scp=$data/wav.scp	# 得到音频路径列表
 
 required="$scp $mfcc_config"
+# $mfcc_config就是conf/mfcc.conf，所以required="$scp $mfcc_config"就相当于将“$data/wav.scp  conf/mfcc.conf”赋给required
 
 for f in $required; do		# 检测wav.scp和mfcc_config.sh文件是否存在
   if [ ! -f $f ]; then
@@ -166,10 +171,11 @@ for f in $required; do		# 检测wav.scp和mfcc_config.sh文件是否存在
     exit 1;
   fi
 done
-
-# 使用validate_data_dir.sh 检测$data里的内容是否正确
+#这里其实就是判断是否有足够的文件，才继续往下运行
 
 utils/validate_data_dir.sh --no-text --no-feats $data || exit 1;
+# 使用validate_data_dir.sh 校验数据目录的脚本，这里会调用一些脚本来检测各种文件及目录是否存在等等
+
 if [ -f $data/spk2warp ]; then
   echo "$0 [info]: using VTLN warp factors from $data/spk2warp"
   vtln_opts="--vtln-map=ark:$data/spk2warp --utt2spk=ark:$data/utt2spk"
@@ -177,6 +183,8 @@ elif [ -f $data/utt2warp ]; then
   echo "$0 [info]: using VTLN warp factors from $data/utt2warp"
   vtln_opts="--vtln-map=ark:$data/utt2warp"
 fi
+# 这块是是否通过VTLN（特征级声道长度标准化）（归一化），这里没有这两种文件，所以这里不调用
+
 
 for n in $(seq $nj); do	# 几个线程就分几个文件 .ark中存放音频mfcc特征
   # the next command does nothing unless $mfccdir/storage/ exists, see
@@ -268,3 +276,8 @@ echo "Succeeded creating MFCC features for $name"
 
 
 ```
+这里可以发现，整篇文档读完后并没有涉及到之前理论分析的操作，其实对应的理论操作在这里：
+
+![makemfcc](/images/blog/makemfcc.png)
+
+底层语言使用C++写的，与理论相对应，但这里不推荐先学习底层。
