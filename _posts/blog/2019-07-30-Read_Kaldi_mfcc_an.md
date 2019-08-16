@@ -2,7 +2,7 @@
 layout: post
 title: Kaldi 理论分析 —— MFCC Features
 categories: Kaldi
-description: 理论分析MFCC特征提取过程
+description: 理论分析MFCC特征提取，阅读run.sh与MFCC提取有关部分，根据论文所描述内容分析大概过程。
 keywords: Kaldi, mfcc, features
 ---
 
