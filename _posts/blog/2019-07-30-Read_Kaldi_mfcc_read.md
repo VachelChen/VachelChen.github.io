@@ -6,9 +6,9 @@ description: 分析与提取特征相关的脚本文件，与理论知识做比�
 keywords: Kaldi, mfcc, features
 ---
 
-run.sh的第二块内容就是创建提取mfcc特征。
+run.sh的第二块内容就是创建提取mfcc特征，对应着又是几个脚本文件，包括make_mfcc.sh，ompute_cmvn_stats.sh等，分析过后发现还是为了确保数据准确性所做的检查数据集的文件操作，并不是就约等于所做的理论分析内容。
 
-```shell
+```sh
 
 #produce MFCC features
 
@@ -73,7 +73,7 @@ done
 
 文件如下：
 
-```shell
+```sh
 
 #!/bin/bash
 
