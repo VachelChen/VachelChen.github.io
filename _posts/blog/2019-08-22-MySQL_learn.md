@@ -10,6 +10,9 @@ MySQL是当下最流行的DMBS，它开源且强大，这次大创在经历了IO
 
 在B站里找了课程学习，记录了一些笔记：
 
+	大致步骤：
+	以管理员方式打开cmd -> net start msql80 打开mysql -> mysql -uroot -p密码
+	进入mysql程序操作。
 
 ## 本单元目标
 
