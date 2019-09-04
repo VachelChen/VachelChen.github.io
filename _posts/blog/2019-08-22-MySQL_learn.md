@@ -929,3 +929,6 @@ sql92
 
 	leave类似于java中的break语句，跳出所在循环！！！
 	
+### mysql数据类型
+
+![mysql](/images/blog/mysqldatastruct.png)
