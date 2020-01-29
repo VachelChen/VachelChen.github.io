@@ -2,8 +2,7 @@
 layout: post
 title: HMM模型建立及参数估计程序化
 categories: theory
-description: 
-一周没参与讨论，现在自己啃一啃把大致程序走一遍，实现程序化。
+description: 一周没参与讨论，现在自己啃一啃把大致程序走一遍，实现程序化。
 keywords: NB,EM
 ---
 
